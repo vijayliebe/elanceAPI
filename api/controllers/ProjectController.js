@@ -7,7 +7,7 @@
 
 var elance = require('../services/elance');
 var elanceJobs = require('../services/elanceJobs');
-
+var request = require("request");
 
 module.exports = {
     getProject: function (req, res) {
@@ -87,6 +87,14 @@ module.exports = {
     podioJobCreate : function(req, res){
         console.log('podioJobCreate route');
         console.log(req.params.all());
+
+        request({
+            uri: "/hook/"+req.param('hook_id')+"/verify/validate",
+            method: "POST"
+        }, function(error, response, body) {
+            console.log(body);
+        });
+
     },
 
     getTitle: function (req, res) {
