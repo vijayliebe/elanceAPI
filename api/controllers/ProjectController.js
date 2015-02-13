@@ -90,7 +90,10 @@ module.exports = {
 
         request({
             uri: "/hook/"+req.param('hook_id')+"/verify/validate",
-            method: "POST"
+            method: "POST",
+            form: {
+                "code": req.param('code')
+            }
         }, function(error, response, body) {
             console.log(body);
         });
