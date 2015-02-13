@@ -89,7 +89,7 @@ module.exports = {
         console.log(req.params.all());
 
         request({
-            uri: "/hook/"+req.param('hook_id')+"/verify/validate",
+            uri: "http://54.88.90.102/jobCreate/hook/"+req.param('hook_id')+"/verify/validate",
             method: "POST",
             form: {
                 "code": req.param('code')
