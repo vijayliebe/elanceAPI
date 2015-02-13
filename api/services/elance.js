@@ -26,7 +26,7 @@ module.exports = {
                                 //$('a#spr-sign-in-btn-standard').click();
 
 
-                                document.getElementById('login_name').value = '';
+                                document.getElementById('login_name').value = 'v';
                                 document.getElementById('passwd').value = '';
 
                                 var a = document.querySelector('a#spr-sign-in-btn-standard');
