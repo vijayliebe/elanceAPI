@@ -14,7 +14,7 @@ module.exports = {
     },
 
     elanceLogin :function(req, res){
-        res.redirect('https://api.elance.com/api2/oauth/authorize?client_id=54db1119e4b0ce56b5a32eb8&redirect_uri=http://localhost:1337/back&scope=basicInfo&response_type=code');
+        res.redirect('https://api.elance.com/api2/oauth/authorize?client_id=54db1119e4b0ce56b5a32eb8&redirect_uri=http://54.88.90.102/back&scope=basicInfo&response_type=code');
     },
 
     getAuthcode : function(req, res){

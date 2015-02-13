@@ -39,6 +39,9 @@ module.exports.routes = {
     '/elancetitle' : 'ProjectController.getTitle',
     '/' : 'UserController.elanceLogin',
 
+    //webhook
+    /jobCreate : ProjectTypeController.podioJobCreate,
+
 
     /***************************************************************************
      *                                                                          *

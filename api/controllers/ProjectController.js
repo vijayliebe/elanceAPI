@@ -84,8 +84,10 @@ module.exports = {
         }
     },
 
-
-
+    podioJobCreate : function(req, res){
+        console.log('podioJobCreate route');
+        console.log(req.params.all());
+    },
 
     getTitle: function (req, res) {
         //res.send(Project.elanceTitle());
