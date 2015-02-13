@@ -1,0 +1,40 @@
+.appHeader{
+  padding: 0 25px 0 25px;
+  color: #fff;
+  font-size: 25px;
+  background: rgb(24, 107, 179);
+}
+
+.appLeftPanel{
+  border-right: 1px solid #eee;
+  height: 700px;
+  background: aliceblue;
+}
+
+.appRightPanel{
+    padding-right: 0px ! important;
+    padding-left: 0px ! important;
+}
+
+.appRightPanelHeader{
+  background: aliceblue;
+  font-weight: bold;
+  font-size: 20px;
+  padding: 5px 10px 5px 5px;
+}
+
+.projTypeLeftPanel{
+    margin-top: 0px;
+    border-right: 1px solid #eee;
+}
+
+.projTypeLeftPanelList{
+    /*padding: 5px 0 5px 0;*/
+    overflow-y: auto;
+    height: 150px;
+    overflow-x: hidden;
+}
+
+.capitalize{
+    text-transform: capitalize;
+}

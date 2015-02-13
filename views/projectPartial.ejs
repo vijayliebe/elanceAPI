@@ -1,0 +1,95 @@
+<div class="container-fluid appHeader">
+    <div class="row">
+        <div class="col-sm-12 col-md-12">Elance</div>
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 appLeftPanel">
+            <ul class="nav ">
+                <li class=""><a href="/">Home</a></li>
+                <li class=""><a href="/project">Projects</a></li>
+                <li class=""><a href="#" data-toggle="modal" data-target="#myModal">Add Project Type</a></li>
+
+            </ul>
+        </div>
+        <div class="col-md-10 appRightPanel">
+            <div class="col-md=12 appRightPanelHeader">Projects</div>
+            <div class="clearfix"></div>
+
+            <table class="table table-striped">
+                <tr>
+                    <th>JobId</th>
+                    <th>Date</th>
+                    <th>Proposals</th>
+                    <th>Name</th>
+                    <th>Budget</th>
+                    <th>Country</th>
+                    <th>Category</th>
+                    <th>Time Left</th>
+                </tr>
+                <% for(var i = 0; i < projects.length; i++) { %>
+                <tr>
+                    <td><a href="<%=projects[i].jobURL  %>" target="_blank"> <%= projects[i].jobId %> </a></td>
+                    <td><%= projects[i].postedDate %></td>
+                    <td><%= projects[i].numProposals %></td>
+                    <td><%= projects[i].name %></td>
+                    <td><%= projects[i].budget %></td>
+                    <td><%= projects[i].clientCountry %></td>
+                    <td><%= projects[i].category %></td>
+                    <td><%= projects[i].timeLeft %></td>
+                </tr>
+                <% } %>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Project Type</h4>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="col-md-4 projTypeLeftPanel">
+                        <div class="" style="padding: 5px 0 5px 0;">
+                            <label class="">Added</label>
+                            <ul id="projectTypesList" class="projTypeLeftPanelList capitalize">
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label>+ Add New</label>
+
+                        <div class="form-group">
+                            <!--<label for="projType">Project Type</label>-->
+                            <input type="text" class="form-control" id="projType" placeholder="Enter Project Type"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" id="projTypeSave" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

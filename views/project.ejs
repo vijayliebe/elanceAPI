@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Projects</title>
+
+    <!-- Viewport mobile tag for sensible mobile support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!--STYLES-->
+    <link rel="stylesheet" href="/styles/bootstrap/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="/styles/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/styles/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/styles/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/custom.css">
+    <link rel="stylesheet" href="/styles/importer.css">
+    <!--STYLES END-->
+</head>
+
+<body>
+<%- partial (partialTemp+'.ejs') %>
+
+<!--SCRIPTS-->
+<script src="/js/jquery-1.10.2.min.js"></script>
+<script src="/js/dependencies/sails.io.js"></script>
+<script src="/js/bootstrap/bootstrap.min.js"></script>
+<script src="/js/bootstrap/npm.js"></script>
+<!--SCRIPTS END-->
+
+<script>
+    var projectTypes;
+
+    $.ajax({
+        url: "/getProjectType",
+        method: "GET",
+        data: {},
+        contentType: 'application/json',
+        processData: false,
+        success: function (data, textStatus, jqXHR) {
+            projectTypes = data;
+            for (var i = 0; i < data.length; i++) {
+                $('#projectTypesList').append('<li>'+data[i].name+'</li>');
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert('Error');
+        }
+    });
+    /* Click Events*/
+    $('#projTypeSave').unbind('click').click(function () {
+        var projType = $('#projType').val().toLowerCase();
+        //empty value validation
+        if (projType == "") {
+            alert('Provide Project Type');
+            return false;
+        }
+        //duplicate validation
+        for (var i = 0; i < projectTypes.length; i++) {
+            if (projectTypes[i].name == projType) {
+                alert('This Project type already exist !');
+                return false;
+            }
+        }
+
+        $.ajax({
+            url: "/saveProjectType",
+            method: "POST",
+            data: JSON.stringify({name: projType}),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data, textStatus, jqXHR) {
+                //data - response from server
+                alert('Successfully Saved');
+                //$('#myModal').modal('hide');
+                //window.location.pathname = "/project"
+
+                $('#projectTypesList').append('<li>'+data.name+'</li>');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert('Error');
+            }
+        });
+
+
+
+    });
+</script>
+
+
+</body>
+</html>
