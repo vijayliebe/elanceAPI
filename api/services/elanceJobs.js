@@ -1,6 +1,6 @@
-var projectModel = require('../models/project');
-var userModel = require('../models/user');
-var projectTypeModel = require('../models/projectType');
+var projectModel = require('../models/Project');
+var userModel = require('../models/User');
+var projectTypeModel = require('../models/ProjectType');
 var request = require("request");
 module.exports = {
 
