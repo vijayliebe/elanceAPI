@@ -86,10 +86,10 @@ module.exports = {
 
     podioJobCreate : function(req, res){
         console.log('podioJobCreate route');
-        console.log(req.params.all());
+        console.log(req.param('hook_id')+'======'+req.param('code'));
 
         request({
-            uri: "http://54.88.90.102/jobCreate/hook/"+req.param('hook_id')+"/verify/validate",
+            uri: "/hook/"+req.param('hook_id')+"/verify/validate",
             method: "POST",
             form: {
                 "code": req.param('code')
