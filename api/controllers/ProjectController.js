@@ -87,10 +87,11 @@ module.exports = {
     podioJobCreate : function(req, res){
         console.log('podioJobCreate route');
         console.log(req.params.all());
+//{ hook_id: '878564', code: 'e265850a', type: 'hook.verify' }
 
-//        if(req.param('verify')){
-//
-//        }
+        if(req.param('type') != 'hook.verify'){
+            return false;
+        }
 
         var requestData = { "code": req.param('code') };
         console.log(JSON.stringify(requestData));
@@ -104,6 +105,8 @@ module.exports = {
             body: JSON.stringify(requestData)
 
         }, function(error, response, body) {
+            console.log(error);
+            console.log(response);
             console.log(body);
         });
 
