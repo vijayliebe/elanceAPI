@@ -89,7 +89,7 @@ module.exports = {
         console.log(req.param('hook_id')+'======'+req.param('code'));
 
         request({
-            uri: "/hook/"+req.param('hook_id')+"/verify/validate",
+            uri: "https://api.podio.com/hook/"+req.param('hook_id')+"/verify/validate",
             method: "POST",
             form: {
                 "code": req.param('code')

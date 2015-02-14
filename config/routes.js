@@ -40,7 +40,7 @@ module.exports.routes = {
     '/' : 'UserController.elanceLogin',
 
     //webhook
-    '/jobCreate' : 'ProjectController.podioJobCreate',
+    'POST /jobCreate' : 'ProjectController.podioJobCreate',
 
 
     /***************************************************************************
