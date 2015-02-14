@@ -118,10 +118,7 @@ module.exports = {
         var https_req = https.request(options, function(httpsres) {
             httpsres.setEncoding('utf8');
             httpsres.on('data', function (chunk) {
-                var chunkData = JSON.parse(chunk);
-                var Tokendata = chunkData.data;
-                console.log(Tokendata);
-
+                console.log(chunk);
             });
         });
 
