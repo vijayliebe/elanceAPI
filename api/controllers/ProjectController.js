@@ -88,15 +88,45 @@ module.exports = {
         console.log('podioJobCreate route');
         console.log(req.param('hook_id')+'======'+req.param('code'));
 
-        request({
-            uri: "https://api.podio.com/hook/"+req.param('hook_id')+"/verify/validate",
-            method: "POST",
-            form: {
-                "code": req.param('code')
-            }
-        }, function(error, response, body) {
-            console.log(body);
+//        request({
+//            uri: "https://api.podio.com/hook/"+req.param('hook_id')+"/verify/validate",
+//            method: "POST",
+//            form: {
+//                "code": req.param('code')
+//            }
+//        }, function(error, response, body) {
+//            console.log(body);
+//        });
+
+        var https = require('https');
+        var querystring = require('querystring');
+
+        var data = querystring.stringify({
+            code: req.param('code')
         });
+
+        var options = {
+            host: 'api.podio.com',
+            path: req.param('hook_id')+'/verify/validate',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(data)
+            }
+        };
+
+        var https_req = https.request(options, function(httpsres) {
+            httpsres.setEncoding('utf8');
+            httpsres.on('data', function (chunk) {
+                var chunkData = JSON.parse(chunk);
+                var Tokendata = chunkData.data;
+                console.log(Tokendata);
+
+            });
+        });
+
+        https_req.write(data);
+        https_req.end();
 
     },
 
