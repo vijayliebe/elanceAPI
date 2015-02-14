@@ -88,17 +88,22 @@ module.exports = {
         console.log('podioJobCreate route');
         console.log(req.param('hook_id')+'======'+req.param('code'));
 
+        var requestData = {
+            "code": req.param('code')
+        };
+
         request({
-            uri: "https://api.podio.com/hook/"+req.param('hook_id')+"/verify/validate",
+            url: "https://api.podio.com/hook/"+req.param('hook_id')+"/verify/validate",
             method: "POST",
-            form: {
-                "code": req.param('code')
-            }
+            json: true,
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+
         }, function(error, response, body) {
             console.log(body);
         });
-
-       
 
     },
 
