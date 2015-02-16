@@ -38,9 +38,12 @@ module.exports.routes = {
     '/getTokens' : 'UserController.getTokens',
     '/elancetitle' : 'ProjectController.getTitle',
     '/' : 'UserController.elanceLogin',
+    '/podiologin' : 'UserController.podiologin',
+    '/podioauth' : 'UserController.podioauth',
+    '/podioauthrefresh' : 'UserController.podioauthrefresh',
 
     //webhook
-    'POST /jobCreate' : 'ProjectController.podioJobCreate',
+    'POST /jobCreate' : 'ProjectController.podioJobCreate'
 
 
     /***************************************************************************
@@ -53,9 +56,9 @@ module.exports.routes = {
      *                                                                          *
      ***************************************************************************/
 
-    '/appHome': {
-        view: 'homepage'
-    }
+//    '/': {
+//        view: 'homepage'
+//    }
 
     /***************************************************************************
      *                                                                          *

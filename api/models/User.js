@@ -23,7 +23,8 @@ module.exports = {
     },
 
     saveToken : function(tokenObj, callback){
-        User.destroy().exec(function (errror, tokens) {
+
+        User.destroy({tokenName : tokenObj.tokenName}).exec(function (errror, tokens) {
             if (!errror) {
                 User.create(tokenObj).exec(function (err, token) {
                     if (!err) {

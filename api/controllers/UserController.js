@@ -5,7 +5,8 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var elancAppMainDataObj = elancAppMainDataObj
+var elancAppMainDataObj = elancAppMainDataObj;
+var request = require("request");
 
 module.exports = {
     signup: function (req, res) {
@@ -14,7 +15,58 @@ module.exports = {
     },
 
     elanceLogin :function(req, res){
-        res.redirect('https://api.elance.com/api2/oauth/authorize?client_id=54db1119e4b0ce56b5a32eb8&redirect_uri=http://54.88.90.102/back&scope=basicInfo&response_type=code');
+        res.redirect('https://api.elance.com/api2/oauth/authorize?client_id='+sails.config.globals.elancAppMainDataObj.client_id_elance+'&redirect_uri='+sails.config.globals.elancAppMainDataObj.webredirecrUrlElance+'&scope=basicInfo&response_type=code');
+    },
+
+    podiologin :function(req, res){
+        //res.redirect('https://podio.com/oauth/authorize?response_type=token&client_id=elanceapi&redirect_uri='+sails.config.globals.elancAppMainDataObj.localredirecrUrl2);
+        res.redirect('https://podio.com/oauth/authorize?client_id='+sails.config.globals.elancAppMainDataObj.client_id_podio+'&redirect_uri='+sails.config.globals.elancAppMainDataObj.webredirecrUrlPodio);
+    },
+
+    podioauth : function(req, res){
+            console.log(req.param('code'));
+
+
+        request({
+            uri: "https://podio.com/oauth/token?grant_type=authorization_code&client_id="+sails.config.globals.elancAppMainDataObj.client_id_podio+"&redirect_uri="+sails.config.globals.elancAppMainDataObj.webredirecrUrlPodio+"&client_secret="+sails.config.globals.elancAppMainDataObj.client_secret_podio+"&code="+req.param('code'),
+            method: "POST"
+        }, function (error, response, body) {
+            var Tokendata = JSON.parse(body);
+            Tokendata.tokenName = "podio";
+            console.log(Tokendata);
+            sails.config.globals.elancAppMainDataObj.tokenDataPodio = Tokendata;
+                return User.saveToken(Tokendata, function (err, token) {
+                if (err) {
+                    res.forbidden();
+                } else {
+                    res.json(token);
+                    res.redirect('/project');
+                }
+            });
+
+        });
+
+
+    },
+
+
+    podioauthrefresh : function(req, res) {
+        //https://podio.com/oauth/token?grant_type=refresh_token&client_id=YOUR_APP_ID&client_secret=YOUR_APP_SECRET&refresh_token=REFRESH_TOKEN
+
+        request({
+            //uri: "https://api.podio.com/item/"+req.param('item_id')+"?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
+            uri: "https://podio.com/oauth/token?grant_type=refresh_token&client_id=YOUR_APP_ID&client_secret=YOUR_APP_SECRET&refresh_token=REFRESH_TOKEN",
+            method: "GET",
+            timeout: 10000,
+            followRedirect: true,
+            maxRedirects: 10
+        }, function (error, response, body) {
+            var data = JSON.parse(body);
+
+
+
+        });
+
     },
 
     getAuthcode : function(req, res){
@@ -23,9 +75,9 @@ module.exports = {
 
         var data = querystring.stringify({
             code: req.param('code'),
-            client_id: '54db1119e4b0ce56b5a32eb8',
-            client_secret: '3zINaEeIe4K9OPMZTNol0A',
-            redirect_uri: 'http://localhost:1337/back2',
+            client_id: sails.config.globals.elancAppMainDataObj.client_id_elance,
+            client_secret: sails.config.globals.elancAppMainDataObj.client_secret_elance,
+            redirect_uri: sails.config.globals.elancAppMainDataObj.webredirecrUrlElance,
             grant_type: 'authorization_code'
         });
 
@@ -44,15 +96,16 @@ module.exports = {
             httpsres.on('data', function (chunk) {
                 var chunkData = JSON.parse(chunk);
                 var Tokendata = chunkData.data;
+                Tokendata.tokenName = "elance";
                 console.log(Tokendata);
-                sails.config.globals.elancAppMainDataObj.tokenData = [];
-                sails.config.globals.elancAppMainDataObj.tokenData.push(Tokendata);
+                sails.config.globals.elancAppMainDataObj.tokenDataElance = Tokendata;
                 return User.saveToken(Tokendata, function (err, token) {
                     if (err) {
                         res.forbidden();
                     } else {
                         res.json(token);
-                        res.redirect('/project');
+                        //res.redirect('/project');
+                        res.redirect('/podiologin');
                     }
                 });
 
