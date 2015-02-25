@@ -64,6 +64,8 @@ module.exports.globals = {
     elancAppMainDataObj: {},
 
     elancAppMainDataObjLocal: {
+        userData : {},
+        userInfo : {},
         tokenDataElance: {},
         tokenDataPodio: {},
         projTypes: [
@@ -71,16 +73,43 @@ module.exports.globals = {
         ],
         projIds: [],
         webredirecrUrlElance: 'http://localhost:1338/back',
-        webredirecrUrlPodio: 'https://3d870545.ngrok.com/podioauth',
+        webredirecrUrlPodio: 'https://5189afc3.ngrok.com/podioauth',
+        webredirecrUrlPodioHookJobPost : "https://5189afc3.ngrok.com/jobCreate",
         client_id_elance: "54db1119e4b0ce56b5a32eb8",
         client_id_podio: "elanceapi",
         client_secret_elance: "3zINaEeIe4K9OPMZTNol0A",
-        client_secret_podio: "WRExsjEHUe1ZUwQvSkjoKTpIk0L1gZKxlFLDcsXctVpNLMyqzH63MrZCya0sLYtH"
+        client_secret_podio: "WRExsjEHUe1ZUwQvSkjoKTpIk0L1gZKxlFLDcsXctVpNLMyqzH63MrZCya0sLYtH",
+        getAccessToken : function(userId, type){
+            for(var i=0; i<this.userData.length; i++){
+                if(this.userData[i].userInfo.user_id == userId){
+                    if(type == "elance" ){
+                        return this.userData[i].elanceAuth.access_token;
+                    }else{
+                        return this.userData[i].podioAuth.access_token;
+                    }
 
+                }
+            }
+        },
+
+        getRefreshToken : function(userId, type){
+            for(var i=0; i<this.userData.length; i++){
+                if(this.userData[i].userInfo.user_id == userId){
+                    if(type == "elance" ){
+                        return this.userData[i].elanceAuth.refresh_token;
+                    }else{
+                        return this.userData[i].podioAuth.refresh_token;
+                    }
+
+                }
+            }
+        }
 
     },
 
     elancAppMainDataObjRemote: {
+        userData : {},
+        userInfo : {},
         tokenDataElance: {},
         tokenDataPodio: {},
         projTypes: [
@@ -89,10 +118,42 @@ module.exports.globals = {
         projIds: [],
         webredirecrUrlElance: 'http://localhost:1338/back',
         webredirecrUrlPodio: 'http://54.88.90.102/podioauth',
+        webredirecrUrlPodioHookJobPost : "http://54.88.90.102/jobCreate",
         client_id_elance: "54db1119e4b0ce56b5a32eb8",
         client_id_podio: "elanceapimain",
         client_secret_elance: "3zINaEeIe4K9OPMZTNol0A",
-        client_secret_podio: "0V3Eg4vcLCWWebvDIuPRmE8bu18TadatfLCJLp1WCkeebPxGh8knjKXieEYYF71U"
+        client_secret_podio: "0V3Eg4vcLCWWebvDIuPRmE8bu18TadatfLCJLp1WCkeebPxGh8knjKXieEYYF71U",
+        getAccessToken : function(userId, type){
+            for(var i=0; i<this.userData.length; i++){
+                if(this.userData[i].userInfo.user_id == userId){
+                    if(type == "elance" ){
+                        return this.userData[i].elanceAuth.access_token;
+                    }else{
+                        return this.userData[i].podioAuth.access_token;
+                    }
+
+                }
+            }
+        },
+
+        getRefreshToken : function(userId, type){
+            for(var i=0; i<this.userData.length; i++){
+                if(this.userData[i].userInfo.user_id == userId){
+                    if(type == "elance" ){
+                        return this.userData[i].elanceAuth.refresh_token;
+                    }else{
+                        return this.userData[i].podioAuth.refresh_token;
+                    }
+
+                }
+            }
+        }
+    },
+
+    podioAppIds :{
+        proposal : "11169426",
+        category : "11333622",
+        subcategory : "11333626"
     }
 
 };

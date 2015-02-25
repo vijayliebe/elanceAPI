@@ -52,10 +52,24 @@ module.exports = {
     },
 
     saveProject: function (req, callback) {
+
+        Project.create(req).exec(function (err, proj) {
+            if (!err) {
+                return callback(null, proj);
+
+            } else {
+                return callback(err, {"status": "failed"});
+            }
+        });
+
+    },
+
+    saveMultipleProject: function (req, callback) {
+
         for (var i = 0; i < req.length; i++) {
             for (var m = 0; m < sails.config.globals.elancAppMainDataObj.projIds.length; m++) {
                 if (req[i].jobId == sails.config.globals.elancAppMainDataObj.projIds[i].jobId) {
-                    req.splice(i,1);
+                    req.splice(i, 1);
                 }
             }
         }
@@ -63,16 +77,16 @@ module.exports = {
 
         for (var i = 0; i < req.length; i++) {
             //for (var m = 0; m < sails.config.globals.elancAppMainDataObj.projIds.length; m++) {
-              //  if (req[i].jobId != sails.config.globals.elancAppMainDataObj.projIds[i].jobId) {
-                    Project.create(req[i]).exec(function (err, proj) {
-                        if (!err) {
-                            return callback(null, proj);
+            //  if (req[i].jobId != sails.config.globals.elancAppMainDataObj.projIds[i].jobId) {
+            Project.create(req[i]).exec(function (err, proj) {
+                if (!err) {
+                    return callback(null, proj);
 
-                        } else {
-                            return callback(err, {"status": "failed"});
-                        }
-                    });
-                //}
+                } else {
+                    return callback(err, {"status": "failed"});
+                }
+            });
+            //}
             //}
         }
 

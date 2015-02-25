@@ -33,17 +33,22 @@ module.exports.routes = {
     'GET /getProjectType': 'ProjectTypeController.getProjectType',
     'POST /saveProjectType': 'ProjectTypeController.saveProjectType',
 
+    //config page
+    '/elancePodioConfig' : 'UserController.elancePodioConfig',
+
     //elance data
     '/back' : 'UserController.getAuthcode',
-    '/getTokens' : 'UserController.getTokens',
+    'GET /getTokens' : 'UserController.getTokens',
     '/elancetitle' : 'ProjectController.getTitle',
     '/' : 'UserController.elanceLogin',
     '/podiologin' : 'UserController.podiologin',
     '/podioauth' : 'UserController.podioauth',
     '/podioauthrefresh' : 'UserController.podioauthrefresh',
 
-    //webhook
-    'POST /jobCreate' : 'ProjectController.podioJobCreate'
+    //job post automation and webhook
+    '/jobPostAutomation/:spaceID' : 'ProjectController.jobPostAutomation',
+    '/podioWorkSpace' : 'ProjectController.podioWorkSpace',
+    'POST /jobCreate/:userID' : 'ProjectController.podioJobCreate'
 
 
     /***************************************************************************
