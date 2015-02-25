@@ -116,7 +116,7 @@ module.exports.globals = {
             {name: "php"}
         ],
         projIds: [],
-        webredirecrUrlElance: 'http://localhost:1338/back',
+        webredirecrUrlElance: 'http://54.88.90.102/back',
         webredirecrUrlPodio: 'http://54.88.90.102/podioauth',
         webredirecrUrlPodioHookJobPost : "http://54.88.90.102/jobCreate",
         client_id_elance: "54db1119e4b0ce56b5a32eb8",
