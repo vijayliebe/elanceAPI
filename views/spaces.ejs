@@ -1,0 +1,34 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 appLeftPanel">
+            <ul class="nav ">
+                <li class=""><a href="#"><b>Work Spaces</b></a></li>
+                <!--<li class=""><a href=#>Configuration</a></li>-->
+            </ul>
+
+            <div class="clearfix"></div>
+
+            <ul class="nav ">
+                <% for(var i = 0; i < spaces.length; i++) { %>
+                <li class=""><a href="/jobPostAutomation/<%= spaces[i].space_id %>" data-space-ID ="<%= spaces[i].space_id %>" data-org-ID="<%= spaces[i].org_id %>"><%= spaces[i].name %></a></li>
+                <% } %>
+            </ul>
+
+        </div>
+        <div class="col-md-10 appRightPanel">
+            <div class="col-md=12 appRightPanelHeader">Configuration</div>
+            <div class="clearfix"></div>
+
+            <ul class="nav ">
+                <li class=""><a href="/jobPostAutomation">Elance Job Posting Automation</a></li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
