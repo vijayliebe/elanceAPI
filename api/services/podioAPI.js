@@ -51,7 +51,7 @@ module.exports = {
             },
             body: {
                 "fields": {
-                    "category-of-work": category.catName
+                    "subcategory-of-work": category.catName
                 },
                 "file_ids": [],
                 "tags": []
@@ -77,54 +77,54 @@ module.exports = {
     },
 
     podioCreateProposal : function(proposal){
-        rp({
-            uri: "https://api.podio.com/item/app/" + sails.config.globals.podioAppIds.proposal + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
-            method: "POST",
-            json: true,
-            headers: {
-                "content-type": "application/json"
-            },
-            body: {
-                "fields": {
-                    "title": jobData.name,
-                    "va-name": joProposalsData.providerName,
-                    "status": [],
-                    "text-2": "TESTING",
-                    "proposal-amount": "220",
-                    "delivery-timeframe": "TESTING",
-                    "rate": joProposalsData.hourlyRate,
-                    "jobs-started-in-the-last-12-months": "TESTING",
-                    "text-3": "TESTING",
-                    "earnings-from-the-last-12-months": "TESTING",
-                    "average-job-rating": "TESTING",
-                    "job": [
-                        {
-                            "value": item_id
-                        }
-                    ],
-                    "va-team": []
-                },
-                "file_ids": [],
-                "tags": []
-            }
-
-        })
-            .then(function (body) {
-                console.log('Saving sub-category success -podio');
-
-                category.user_id = sails.config.globals.elancAppMainDataObj.userInfo.user_id;
-
-                Subcategory.savesubcategory(category, function (err, proj) {
-                    if (err) {
-                        console.log('Saving sub-category Failed');
-                    } else {
-                        console.log('Saving csub-ategory success -local');
-                    }
-                });
-            })
-            .catch(function(error){
-                console.log(error);
-            });
+//        rp({
+//            uri: "https://api.podio.com/item/app/" + sails.config.globals.podioAppIds.proposal + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
+//            method: "POST",
+//            json: true,
+//            headers: {
+//                "content-type": "application/json"
+//            },
+//            body: {
+//                "fields": {
+//                    "title": jobData.name,
+//                    "va-name": joProposalsData.providerName,
+//                    "status": [],
+//                    "text-2": "TESTING",
+//                    "proposal-amount": "220",
+//                    "delivery-timeframe": "TESTING",
+//                    "rate": joProposalsData.hourlyRate,
+//                    "jobs-started-in-the-last-12-months": "TESTING",
+//                    "text-3": "TESTING",
+//                    "earnings-from-the-last-12-months": "TESTING",
+//                    "average-job-rating": "TESTING",
+//                    "job": [
+//                        {
+//                            "value": item_id
+//                        }
+//                    ],
+//                    "va-team": []
+//                },
+//                "file_ids": [],
+//                "tags": []
+//            }
+//
+//        })
+//            .then(function (body) {
+//                console.log('Saving sub-category success -podio');
+//
+//                category.user_id = sails.config.globals.elancAppMainDataObj.userInfo.user_id;
+//
+//                Subcategory.savesubcategory(category, function (err, proj) {
+//                    if (err) {
+//                        console.log('Saving sub-category Failed');
+//                    } else {
+//                        console.log('Saving csub-ategory success -local');
+//                    }
+//                });
+//            })
+//            .catch(function(error){
+//                console.log(error);
+//            });
     },
 
     podioSpaces: function (req, callback) {
