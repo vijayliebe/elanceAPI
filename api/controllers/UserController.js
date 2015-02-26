@@ -57,7 +57,7 @@ module.exports = {
             rp('https://api.podio.com/user/profile?oauth_token=' + Tokendata.access_token)
                 .then(function (body) {
                     var _data = JSON.parse(body);
-                    userInfo = _data;
+                    var userInfo = _data;
 
                     sails.config.globals.elancAppMainDataObj.userInfo = userInfo;
 
@@ -72,8 +72,8 @@ module.exports = {
                         } else {
                             res.json(users);
                             sails.config.globals.elancAppMainDataObj.userData = users;
-                            res.redirect('/podioWorkSpace');
-                            //sails.controllers.proposals.getElanceProposals();
+                            //res.redirect('/podioWorkSpace');
+                            sails.controllers.proposals.getElanceProposals(userInfo.user_id);
                             //sails.controllers.category.getElanceCategory();
                             //sails.controllers.subcategory.getElanceSubCategory();
                         }

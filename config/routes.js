@@ -48,7 +48,8 @@ module.exports.routes = {
     //job post automation and webhook
     '/jobPostAutomation/:spaceID' : 'ProjectController.jobPostAutomation',
     '/podioWorkSpace' : 'ProjectController.podioWorkSpace',
-    'POST /jobCreate/:userID' : 'ProjectController.podioJobCreate'
+    'POST /jobCreate/:userID' : 'ProjectController.podioJobCreate',
+    'POST /proposalUpdate/:userID' : 'ProposalsController.elanceProposalUpdate'
 
 
     /***************************************************************************

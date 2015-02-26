@@ -5,9 +5,8 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var elance = require('../services/elance');
-var elanceJobs = require('../services/elanceJobs');
 var request = require("request");
+var rp = require('request-promise');
 
 module.exports = {
     getProject: function (req, res) {
@@ -230,10 +229,10 @@ module.exports = {
                             data = JSON.parse(body);
 
                             //saving posted job in local DB
-                            data.data.item_id = itemID;
+                            data.data.item_id = parseInt(itemID);
                             console.log('itemID--------->'+itemID);
 
-                            data.data.user_id = userID;
+                            data.data.user_id = parseInt(userID);
 
                             Project.saveProject(data.data, function (err, proj) {
                                 if (err) {
@@ -241,6 +240,11 @@ module.exports = {
                                 } else {
                                     console.log('storing posted job in DB success');
                                     console.log(proj);
+
+                                    setTimeout(function(){
+                                        sails.controllers.category.getElanceCategory(userID);
+                                    },1000*60*60);
+
                                 }
                             });
 

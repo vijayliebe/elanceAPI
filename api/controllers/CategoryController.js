@@ -12,10 +12,9 @@ module.exports = {
 
     getElanceCategory: function (req, res) {
         var url = "https://api.elance.com/api2/categories?access_token=" + sails.config.globals.elancAppMainDataObj.tokenDataElance.access_token;
-        var processFlag = true;
-        var itemInsert = false;
 
         emitter = pollingtoevent(function (done) {
+
             rp.get(url, function (err, req, data) {
                 done(err, data);
             });

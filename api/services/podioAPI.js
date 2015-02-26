@@ -5,7 +5,7 @@ var async = require('asyncjs');
 
 module.exports = {
 
-    podioCreateJobCategory : function(category){
+    podioCreateJobCategory: function (category) {
 
         rp({
             uri: "https://api.podio.com/item/app/" + sails.config.globals.podioAppIds.category + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
@@ -36,12 +36,12 @@ module.exports = {
                     }
                 });
             })
-            .catch(function(error){
+            .catch(function (error) {
                 console.log(error);
             });
     },
 
-    podioCreateJobSubCategory : function(category){
+    podioCreateJobSubCategory: function (category) {
         rp({
             uri: "https://api.podio.com/item/app/" + sails.config.globals.podioAppIds.subcategory + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
             method: "POST",
@@ -71,12 +71,12 @@ module.exports = {
                     }
                 });
             })
-            .catch(function(error){
+            .catch(function (error) {
                 console.log(error);
             });
     },
 
-    podioCreateProposal : function(proposal){
+    podioCreateProposal: function (proposal) {
 //        rp({
 //            uri: "https://api.podio.com/item/app/" + sails.config.globals.podioAppIds.proposal + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
 //            method: "POST",
@@ -141,7 +141,8 @@ module.exports = {
 
     podioAppCreate: function (spaceID) {
         spaceID = parseInt(spaceID);
-        var categoryAppID, subCategoryAppID, skillAppID, jobPostAppID;
+
+        var categoryAppID, subCategoryAppID, skillAppID, jobPostAppID, proposalAppID;
         var categoryPayload = {
             "space_id": spaceID,
             "config": {
@@ -901,6 +902,14 @@ module.exports = {
                 jobPostPayload.fields[3].config.settings.referenceable_types[0] = body.app_id;
                 console.log('Category App created');
 
+                //saving category App in local DB
+                body.user_id = sails.config.globals.elancAppMainDataObj.userInfo.user_id;
+                Application.saveApplication(body, function (err, data) {
+                    if (!err) {
+                        console.log('saving category App in local DB');
+                    }
+                });
+
                 //sub-category app
                 rp({
                     uri: "https://api.podio.com/app?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
@@ -919,6 +928,14 @@ module.exports = {
                         jobPostPayload.fields[4].config.settings.referenceable_types[0] = body.app_id;
                         console.log('Sub-category App created');
 
+                        //saving Sub-category App in local DB
+                        body.user_id = sails.config.globals.elancAppMainDataObj.userInfo.user_id;
+                        Application.saveApplication(body, function (err, data) {
+                            if (!err) {
+                                console.log('saving Sub-category App in local DB');
+                            }
+                        });
+
                         // specific skill app
                         rp({
                             uri: "https://api.podio.com/app?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
@@ -936,6 +953,14 @@ module.exports = {
                                 jobPostPayload.fields[5].config.settings.referenceable_types[0] = body.app_id;
                                 console.log('Specific skill App created');
 
+                                //saving specific skill App in local DB
+                                body.user_id = sails.config.globals.elancAppMainDataObj.userInfo.user_id;
+                                Application.saveApplication(body, function (err, data) {
+                                    if (!err) {
+                                        console.log('saving specific skill App in local DB');
+                                    }
+                                });
+
                                 //Job posting app
                                 rp({
                                     uri: "https://api.podio.com/app?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
@@ -952,6 +977,13 @@ module.exports = {
                                         proposalPayload.fields[12].config.settings.referenceable_types[0] = body.app_id;
                                         console.log('Job Post App created');
 
+                                        //saving JobPost App in local DB
+                                        body.user_id = sails.config.globals.elancAppMainDataObj.userInfo.user_id;
+                                        Application.saveApplication(body, function (err, data) {
+                                            if (!err) {
+                                                console.log('saving JobPost App in local DB');
+                                            }
+                                        });
 
                                         //proposal app
                                         rp({
@@ -966,6 +998,18 @@ module.exports = {
                                         })
                                             .then(function (body) {
                                                 console.log('proposal App created');
+                                                proposalAppID = body.app_id;
+                                                sails.config.globals.podioAppIds.proposal = categoryAppID;
+
+
+                                                //saving proposal App in local DB
+                                                body.user_id = sails.config.globals.elancAppMainDataObj.userInfo.user_id;
+                                                Application.saveApplication(body, function (err, data) {
+                                                    if (!err) {
+                                                        console.log('saving proposal App in local DB');
+                                                    }
+                                                });
+
                                                 //create web-hook for job post app
                                                 rp({
                                                     uri: "https://api.podio.com/hook/app/" + jobPostAppID + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
@@ -981,11 +1025,33 @@ module.exports = {
 
                                                 })
                                                     .then(function (body) {
+                                                        console.log('JobPost webhook created');
+                                                        //create web-hook for proposal app - update
+                                                        rp({
+                                                            uri: "https://api.podio.com/hook/app/" + proposalAppID + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
+                                                            method: "POST",
+                                                            json: true,
+                                                            headers: {
+                                                                "content-type": "application/json"
+                                                            },
+                                                            body: {
+                                                                "url": sails.config.globals.elancAppMainDataObj.webredirecrUrlPodioHookProposalUpdate + "/" + sails.config.globals.elancAppMainDataObj.userInfo.user_id,
+                                                                "type": "item.update"
+                                                            }
 
-                                                        setTimeout(function () {
-                                                            sails.controllers.category.getElanceCategory(categoryAppID);
-                                                            sails.controllers.subcategory.getElanceSubCategory(subCategoryAppID);
-                                                        }, 5000);
+                                                        })
+                                                            .then(function (body) {
+
+                                                                console.log('proposal webhook created');
+                                                                setTimeout(function () {
+                                                                    sails.controllers.category.getElanceCategory(categoryAppID);
+                                                                    sails.controllers.subcategory.getElanceSubCategory(subCategoryAppID);
+                                                                }, 5000);
+
+
+                                                            })
+                                                            .catch(console.error);
+
 
                                                     })
                                                     .catch(console.error);
@@ -1025,5 +1091,55 @@ module.exports = {
             .then(function (body) {
             })
             .catch(console.error);
+    },
+
+    podioSaveProposalItem: function (currentProject, jobData, elanceProposal, callback) {
+        Application.find({user_id: 2718133, "config.item_name": "Proposal"}).exec(function (err, appDetail) {
+            if (err) {
+                console.log('Failed');
+            } else {
+                var appID = appDetail[0].app_id;
+                rp({
+                    uri: "https://api.podio.com/item/app/" + appID + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
+                    method: "POST",
+                    json: true,
+                    headers: {
+                        "content-type": "application/json"
+                    },
+                    body: {
+                        "fields": {
+                            "title": jobData.name,
+                            "proposal-va-name": elanceProposal.providerName,
+                            "status": [],
+                            "proposal": "TESTING",
+                            "proposal-amount": "220",
+                            "text": "TESTING",
+                            "delivery-timeframe": "TESTING",
+                            "rate": elanceProposal.hourlyRate,
+                            "jobs-started-in-the-last-12-months": "TESTING",
+                            "text-2": "TESTING",
+                            "earnings-from-the-last-12-months": "TESTING",
+                            "average-job-rating": "TESTING",
+                            "job": [
+                                {
+                                    "value": currentProject.item_id
+                                }
+                            ],
+                            "va-team": []
+                        },
+                        "file_ids": [],
+                        "tags": []
+                    }
+
+                }).then(function (body) {
+                    callback(null, body);
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+            }
+        });
+
+
     }
 }
