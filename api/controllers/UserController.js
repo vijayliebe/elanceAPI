@@ -72,8 +72,8 @@ module.exports = {
                         } else {
                             res.json(users);
                             sails.config.globals.elancAppMainDataObj.userData = users;
-                            //res.redirect('/podioWorkSpace');
-                            sails.controllers.proposals.getElanceProposals(userInfo.user_id);
+                            res.redirect('/podioWorkSpace');
+                            //sails.controllers.proposals.getElanceProposals(userInfo.user_id);
                             //sails.controllers.category.getElanceCategory();
                             //sails.controllers.subcategory.getElanceSubCategory();
                         }
