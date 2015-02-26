@@ -12,7 +12,7 @@
 module.exports.bootstrap = function(cb) {
 
     getElancAppMainDataObj: (function () {
-        var serverType = 'local';
+        var serverType = 'remote';
         switch (serverType) {
             case 'local' :
                 sails.config.globals.elancAppMainDataObj = sails.config.globals.elancAppMainDataObjLocal;
