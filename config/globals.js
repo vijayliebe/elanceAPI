@@ -119,9 +119,9 @@ module.exports.globals = {
         webredirecrUrlElance: 'http://54.88.90.102/back',
         webredirecrUrlPodio: 'http://54.88.90.102/podioauth',
         webredirecrUrlPodioHookJobPost : "http://54.88.90.102/jobCreate",
-        client_id_elance: "54db1119e4b0ce56b5a32eb8",
+        client_id_elance: "54ee5c47e4b0ce56b5a32ed6",
         client_id_podio: "elanceapimain",
-        client_secret_elance: "3zINaEeIe4K9OPMZTNol0A",
+        client_secret_elance: "6goKMXnTwo_XiFk1MC3qCA",
         client_secret_podio: "0V3Eg4vcLCWWebvDIuPRmE8bu18TadatfLCJLp1WCkeebPxGh8knjKXieEYYF71U",
         getAccessToken : function(userId, type){
             for(var i=0; i<this.userData.length; i++){
