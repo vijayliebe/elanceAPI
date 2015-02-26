@@ -243,7 +243,7 @@ module.exports = {
 
                                     setTimeout(function(){
                                         sails.controllers.category.getElanceCategory(userID);
-                                    },1000*60*60);
+                                    },10000);
 
                                 }
                             });
