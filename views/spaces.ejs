@@ -10,7 +10,7 @@
 
             <ul class="nav ">
                 <% for(var i = 0; i < spaces.length; i++) { %>
-                <li class=""><a href="/jobPostAutomation/<%= spaces[i].space_id %>" data-space-ID ="<%= spaces[i].space_id %>" data-org-ID="<%= spaces[i].org_id %>"><%= spaces[i].name %></a></li>
+                <li class="workspace"><a href="#" data-space-ID ="<%= spaces[i].space_id %>" data-org-ID="<%= spaces[i].org_id %>"><%= spaces[i].name %></a></li>
                 <% } %>
             </ul>
 
@@ -27,7 +27,11 @@
     </div>
 </div>
 
-
+<script>
+    $('.workspace').click(function(){
+        $(this).css("pointer-events","none");
+    });
+</script>
 
 
 
