@@ -66,6 +66,17 @@ module.exports = {
         });
 
 
+    },
+
+    getUserById : function(userId, callback){
+        var userId = userId;
+        User.find({"userInfo.user_id" : userId}).exec(function(err, user){
+            if(!err){
+                return callback(null, user);
+            }else{
+                return callback(err, {"status" : "Failed"});
+            }
+        });
     }
 };
 

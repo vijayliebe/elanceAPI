@@ -30,5 +30,17 @@ module.exports = {
             .catch(function (error) {
                 console.log(error);
             });
+    },
+
+    elanceAwardProposal : function(elanceAccess, bidid, callback){
+        rp.post({
+            url: 'https://api.elance.com/api2/projects/bids/'+bidid+'/terms?access_token=' + elanceAccess
+        }).then(function(body){
+            var _data = JSON.parse(body);
+            return callback(null, _data);
+        })
+            .catch(function(error){
+                console.log(error);
+            });
     }
 }

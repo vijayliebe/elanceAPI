@@ -22,12 +22,8 @@ module.exports = {
     },
 
     elanceProposalUpdate: function (req, res) {
-        var userID = req.param('userID');
+        var userId = parseInt(req.param('userID'));
         var type = req.param('type');
-
-        var podioAccess = sails.config.globals.elancAppMainDataObj.getAccessToken(userID, "podio");
-        var elanceAccess = sails.config.globals.elancAppMainDataObj.getAccessToken(userID, "elance");
-
 
         var verifyHook = function () {
             console.log('verifying hook');
@@ -53,6 +49,71 @@ module.exports = {
         var useVerifiedHook = function () {
             console.log('using verified hook');
             console.log(req.params.all());
+
+            var item_id = parseInt(req.param('item_id'));
+
+            User.getUserById(userId, function(err, user){
+                if(!err){
+                    var elanceAccess = user[0].elanceAuth.access_token;
+                    var podioAccess = user[0].podioAuth.access_token;
+
+
+                    podioAPI.podioGetItemById(podioAccess,item_id, function(err, podioProposal){
+                        if(!err){
+                            var podioProposal = podioProposal;
+                            var podioProposalFields = podioProposal.fields
+                            var formattedPodioProposalFields = {};
+                            var status; //may be Received, Awarded or Awarded and Allow another
+                            _.each(podioProposalFields, function(podioProposalField){
+                                formattedPodioProposalFields[podioProposalField.label] = podioProposalField;
+                            });
+
+                            status = formattedPodioProposalFields.Status ? formattedPodioProposalFields.Status.values[0].value.text : null;
+
+                            if(status != "Awarded") return false;
+
+                            Proposals.proposalByUserItemId(userId, item_id, function(err, proposalItem){
+                                if(!err){
+                                    var proposalItem = proposalItem;
+                                    var bid_id = proposalItem[0].bidId;
+
+                                    elanceAPI.elanceAwardProposal(elanceAccess, bid_id, function(err, awardedProposal){
+                                        if(!err){
+                                            var bidId = awardedProposal.data.bidId;
+                                            proposalItem[0].status = "Awarded"; // updating proposal data
+
+                                            Proposals.updateProposalByBidId(userId,bidId,proposalItem[0], function(err, proposal){
+                                                if(!err){
+                                                    console.log('Update proposal successful');
+                                                }else{
+                                                    console.log('Update proposal Failed');
+                                                }
+                                            });
+
+                                        }else{
+                                            console.log('Awarding Proposal Failed');
+                                        }
+                                    });
+
+                                }else{
+                                    console.log(err);
+                                }
+                            });
+
+
+                        }else{
+                            console.log('Getting podio proposal item - Failed');
+                        }
+                    });
+
+
+
+                }else{
+                    console.log('proposalController -> useVerifiedHook -> Failed ');
+                }
+            });
+
+
         };
 
         switch (type) {
@@ -60,7 +121,7 @@ module.exports = {
                 verifyHook();
                 break;
 
-            case 'item.create' :
+            case 'item.update' :
                 useVerifiedHook();
                 break;
 
@@ -107,15 +168,14 @@ module.exports = {
                             var jobData = _data.data.jobData;
                             var joProposalData = _data.data.proposals;
 
-                            var formattedProposal;
+                            var formattedProposal = {};
 
                             //list of proposals saved in local DB
                             Proposals.find({user_id: userID}).exec(function (err, proposals) {
                                 if (!err) {
-
                                     //re-formatting proposal data
                                     _.each(proposals, function (proposal) {
-                                        formattedProposal[proposal.bidId] = bidId;
+                                        formattedProposal[proposal.bidId] = proposal;
                                     });
 
                                     //comparing wheather exist in local DB then publish on podio
@@ -131,6 +191,7 @@ module.exports = {
                                                         //If - podio proposal item - success - > save that proposal in local DB
                                                         elanceProposal.user_id = userID;
                                                         elanceProposal.jobData = jobData;
+                                                        elanceProposal.item_id = data.presence.ref_id;
 
                                                         Proposals.create(elanceProposal).exec(function (err, proj) {
                                                             if (!err) {

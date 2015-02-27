@@ -97,7 +97,7 @@ module.exports = {
         var elanceAccess = sails.config.globals.elancAppMainDataObj.getAccessToken(userID, "elance");
 
 
-        sails.models.subcategory.subcategorylist(null, function (err, categ) {
+        Subcategory.subcategorylist(null, function (err, categ) {
             if (!err) {
                 subcateList = categ;
 

@@ -1141,5 +1141,23 @@ module.exports = {
         });
 
 
+    },
+
+    podioGetItemById : function(podioAccess, itemId, callback){
+
+                rp({
+                    uri: "https://api.podio.com/item/" + itemId + "?oauth_token=" + podioAccess,
+                    method: "GET",
+                    timeout: 10000,
+                    followRedirect: true,
+                    maxRedirects: 10
+                }).then(function(body){
+                    var _data = JSON.parse(body);
+                    return callback(null, _data);
+                })
+                    .catch(function(error){
+                        console.log(error)
+                    });
+
     }
 }
