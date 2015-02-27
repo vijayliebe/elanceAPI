@@ -40,7 +40,8 @@ module.exports.routes = {
     '/back' : 'UserController.getAuthcode',
     'GET /getTokens' : 'UserController.getTokens',
     '/elancetitle' : 'ProjectController.getTitle',
-    '/' : 'UserController.elanceLogin',
+    //'/' : 'UserController.elanceLogin',
+    '/elanceLogin' : 'UserController.elanceLogin',
     '/podiologin' : 'UserController.podiologin',
     '/podioauth' : 'UserController.podioauth',
     '/podioauthrefresh' : 'UserController.podioauthrefresh',
@@ -49,7 +50,7 @@ module.exports.routes = {
     '/jobPostAutomation/:spaceID' : 'ProjectController.jobPostAutomation',
     '/podioWorkSpace' : 'ProjectController.podioWorkSpace',
     'POST /jobCreate/:userID' : 'ProjectController.podioJobCreate',
-    'POST /proposalUpdate/:userID' : 'ProposalsController.elanceProposalUpdate'
+    'POST /proposalUpdate/:userID' : 'ProposalsController.elanceProposalUpdate',
 
 
     /***************************************************************************
@@ -62,9 +63,9 @@ module.exports.routes = {
      *                                                                          *
      ***************************************************************************/
 
-//    '/': {
-//        view: 'homepage'
-//    }
+    '/': {
+        view: 'loginPage'
+    }
 
     /***************************************************************************
      *                                                                          *

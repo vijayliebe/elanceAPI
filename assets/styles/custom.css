@@ -5,6 +5,29 @@
   background: rgb(24, 107, 179);
 }
 
+.appFooter{
+  padding: 0 25px 0 25px;
+  color: #fff;
+  font-size: 15px;
+  background: rgb(24, 107, 179);
+  position:fixed;
+  bottom:0px;
+    width:100%;
+}
+
+.footerText{
+    margin: 0 0 0 45%;
+}
+
+.loginBody{
+    color: #fff;
+    margin: 21% 0 0 45%;
+    background: rgb(24, 107, 179);
+    width: 180px;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+}
 .appLeftPanel{
   border-right: 1px solid #eee;
   height: 700px;
