@@ -82,6 +82,10 @@ module.exports = {
                                             var bidId = awardedProposal.data.bidId;
                                             proposalItem[0].status = "Awarded"; // updating proposal data
 
+                                            delete proposalItem[0].id;
+                                            delete proposalItem[0].updatedAt;
+                                            delete proposalItem[0].createdAt;
+
                                             Proposals.updateProposalByBidId(userId,bidId,proposalItem[0], function(err, proposal){
                                                 if(!err){
                                                     console.log('Update proposal successful');
@@ -152,70 +156,105 @@ module.exports = {
 
         emitter.on("longpoll", function (projects) {
 
-            //looping through job list
-            _.each(projects, function (project) {
+            User.getUserById(userID, function (err, user) {
+                if (!err) {
+                    var elanceAccess = user[0].elanceAuth.access_token;
+                    var podioAccess = user[0].podioAuth.access_token;
 
-                var currentProject = project;
-                //closer to pick current scope
 
-                (function (project) {
+                    _.each(projects, function (project) {
 
-                    //calling service to get online elance proposal list as per jobID
-                    sails.services.elanceapi.elanceProposalById(project, function (err, _data) {
-                        if (!err) {
-                            console.log(_data);
+                        var currentProject = project;
+                        //closer to pick current scope
 
-                            var jobData = _data.data.jobData;
-                            var joProposalData = _data.data.proposals;
+                        (function (project) {
 
-                            var formattedProposal = {};
-
-                            //list of proposals saved in local DB
-                            Proposals.find({user_id: userID}).exec(function (err, proposals) {
+                            //calling service to get online elance proposal list as per jobID
+                            elanceAPI.elanceProposalById(elanceAccess,project, function (err, _data) {
                                 if (!err) {
-                                    //re-formatting proposal data
-                                    _.each(proposals, function (proposal) {
-                                        formattedProposal[proposal.bidId] = proposal;
-                                    });
+                                    console.log(_data);
 
-                                    //comparing wheather exist in local DB then publish on podio
-                                    _.each(joProposalData, function (elanceProposal) {
-                                        if (!_.has(formattedProposal, elanceProposal.bidId)) {
+                                    var jobData = _data.data.jobData;
+                                    var joProposalData = _data.data.proposals;
 
-                                            (function (elanceProposal) {
-                                                sails.services.podioapi.podioSaveProposalItem(currentProject, jobData, elanceProposal, function (err, data) {
-                                                    if (!err) {
+                                    var formattedProposal = {};
 
-                                                        console.log(data);
+                                    //list of proposals saved in local DB
+                                    Proposals.find({user_id: userID}).exec(function (err, proposals) {
+                                        if (!err) {
+                                            //re-formatting proposal data
+                                            _.each(proposals, function (proposal) {
+                                                formattedProposal[proposal.bidId] = proposal;
+                                            });
 
-                                                        //If - podio proposal item - success - > save that proposal in local DB
-                                                        elanceProposal.user_id = userID;
-                                                        elanceProposal.jobData = jobData;
-                                                        elanceProposal.item_id = data.presence.ref_id;
+                                            //comparing wheather exist in local DB then publish on podio
+                                            _.each(joProposalData, function (elanceProposal) {
+                                                if (!_.has(formattedProposal, elanceProposal.bidId)) {
 
-                                                        Proposals.create(elanceProposal).exec(function (err, proj) {
+                                                    (function (elanceProposal) {
+                                                        podioAPI.podioSaveProposalItem(userID, podioAccess, currentProject, jobData, elanceProposal, function (err, data) {
                                                             if (!err) {
-                                                                console.log('Saving Proposal success');
-                                                            } else {
-                                                                console.log('Saving Proposal Failed');
+
+                                                                console.log(data);
+
+                                                                //If - podio proposal item - success - > save that proposal in local DB
+                                                                elanceProposal.user_id = userID;
+                                                                elanceProposal.jobData = jobData;
+                                                                elanceProposal.item_id = data.presence.ref_id;
+
+                                                                Proposals.create(elanceProposal).exec(function (err, proj) {
+                                                                    if (!err) {
+                                                                        console.log('Saving Proposal success');
+                                                                    } else {
+                                                                        console.log('Saving Proposal Failed');
+                                                                    }
+                                                                });
+
+                                                            }else{
+                                                                console.log('Proposal sync - podio proposal post - failed');
+                                                                if(err.error_description == "expired_token"){
+                                                                    podioAPI.podioRefreshToken(userID,function(err, refreshedToken){
+                                                                        if(!err){
+                                                                            ProposalsController.getElanceProposals(userID);
+                                                                        }else{
+                                                                            console.log(err);
+                                                                        }
+                                                                    });
+                                                                }
                                                             }
                                                         });
+                                                    }(elanceProposal));
 
-                                                    }
-                                                });
-                                            }(elanceProposal));
-
+                                                }
+                                            });
                                         }
                                     });
+                                }else{
+                                    console.log('Proposal sync - elance proposal fetch - failed');
+
+                                    if(err.errors[0].code == "invalid_token_expired"){
+                                        elanceAPI.elanceRefreshAccess(userID,function(err, refreshedToken){
+                                            if(!err){
+                                                ProposalsController.getElanceProposals(userID);
+                                            }else{
+                                                console.log(err);
+                                            }
+                                        });
+                                    }
+
                                 }
                             });
-                        }
+
+                        }(project));
+
+
                     });
-
-                }(project));
-
-
+                }else{
+                    console.log('proposalController -> getElanceProposals -> Failed ');
+                }
             });
+            //looping through job list
+
 
         });
 

@@ -23,9 +23,9 @@ module.exports = {
     getProjectDetail: function (req, res) {
 
         //res.send('Project Detail...');
-            var projId = req.param('id');
+        var projId = req.param('id');
         if (projId) {
-            return Project.projectDetail(projId, function (err, proj) {
+            Project.projectDetail(projId, function (err, proj) {
                 if (err) {
                     res.forbidden();
                     //res.send(err);
@@ -90,11 +90,11 @@ module.exports = {
         //            hook_id: '878511' }
 
 
-        var userID = req.param('userID');
+        var userID = parseInt(req.param('userID'));
         var type = req.param('type');
 
-        var podioAccess = sails.config.globals.elancAppMainDataObj.getAccessToken(userID, "podio");
-        var elanceAccess = sails.config.globals.elancAppMainDataObj.getAccessToken(userID, "elance");
+        //var podioAccess = sails.config.globals.elancAppMainDataObj.getAccessToken(userID, "podio");
+        //var elanceAccess = sails.config.globals.elancAppMainDataObj.getAccessToken(userID, "elance");
 
 
         Subcategory.subcategorylist(null, function (err, categ) {
@@ -198,59 +198,83 @@ module.exports = {
                 var useVerifiedHook = function () {
                     console.log('using verified hook');
                     console.log(req.params.all());
-                    var itemID = req.param('item_id');
-                    //reuesting job item data from podio
-                    request({
-                        uri: "https://api.podio.com/item/" + req.param('item_id') + "?oauth_token=" + podioAccess,
-                        method: "GET",
-                        timeout: 10000,
-                        followRedirect: true,
-                        maxRedirects: 10
-                    }, function (error, response, body) {
-                        if (body == undefined) {
-                            console.log(error);
-                            return false;
-                        }
-                        var data = JSON.parse(body);
 
-                        console.log(data);
-                        console.log(data.title);
+                    var itemID = parseInt(req.param('item_id'));
 
-                        var jobPostPayLoad = postJobData(data);
+                    User.getUserById(userID, function (err, user) {
+                        if (!err) {
 
-                        if (!jobPostPayLoad.automation) return false;
+                            var elanceAccess = user[0].elanceAuth.access_token;
+                            var podioAccess = user[0].podioAuth.access_token;
 
-                        //posting job to elance as per data received from podio
-                        request.post({
-                            url: 'https://api.elance.com/api2/projects/jobs?access_token=' + elanceAccess,
-                            form: jobPostPayLoad
-                        }, function (err, httpResponse, body) {
-                            console.log(body);
-                            data = JSON.parse(body);
+                            podioAPI.podioGetItemById(podioAccess, itemID, function (err, podioJobItem) {
+                                if (!err) {
+                                    var podioJobItemData = podioJobItem;
+                                    var jobPostPayLoad = postJobData(podioJobItemData);
 
-                            //saving posted job in local DB
-                            data.data.item_id = parseInt(itemID);
-                            console.log('itemID--------->'+itemID);
+                                    if (!jobPostPayLoad.automation) return false;
 
-                            data.data.user_id = parseInt(userID);
+                                    elanceAPI.elanceJobPost(elanceAccess, jobPostPayLoad, function (err, elancePostedJob) {
 
-                            Project.saveProject(data.data, function (err, proj) {
-                                if (err) {
-                                    console.log('storing posted job in DB failed');
+                                        if (!err) {
+                                            var elancePostedJobData = elancePostedJob;
+
+                                            //saving posted job in local DB
+                                            elancePostedJobData.data.item_id = itemID;
+                                            elancePostedJobData.data.user_id = userID;
+
+                                            Project.saveProject(elancePostedJobData.data, function (err, proj) {
+                                                if (err) {
+                                                    console.log('storing Elance posted job in DB failed');
+                                                } else {
+                                                    console.log('storing Elance posted job in DB success');
+                                                    console.log(proj);
+
+                                                    setTimeout(function () {
+                                                        sails.controllers.proposals.getElanceProposals(userID);
+                                                    }, 10000);
+
+                                                }
+                                            });
+
+                                        } else {
+                                            console.log('Elance Job Post - failed'+err);
+
+                                            if(err.errors[0].code == "invalid_token_expired"){
+                                                elanceAPI.elanceRefreshAccess(userID,function(err, refreshedToken){
+                                                    if(!err){
+                                                        useVerifiedHook();
+                                                    }else{
+                                                       console.log(err);
+                                                    }
+                                                });
+                                            }
+
+                                        }
+                                    });
+
+
                                 } else {
-                                    console.log('storing posted job in DB success');
-                                    console.log(proj);
+                                    console.log('Getting podio Job item - Failed');
 
-                                    setTimeout(function(){
-                                        sails.controllers.category.getElanceCategory(userID);
-                                    },10000);
-
+                                    if(err.error_description == "expired_token"){
+                                        podioAPI.podioRefreshToken(userID,function(err, refreshedToken){
+                                            if(!err){
+                                                useVerifiedHook();
+                                            }else{
+                                                console.log(err);
+                                            }
+                                        });
+                                    }
                                 }
                             });
 
-                        });
 
+                        } else {
+                            console.log('projectController -> useVerifiedHook -> Failed ');
+                        }
                     });
+
 
                 }
 
@@ -276,24 +300,24 @@ module.exports = {
 
     },
 
-    podioWorkSpace : function(req, res){
+    podioWorkSpace: function (req, res) {
 
-        return sails.services.podioapi.podioSpaces(req.body, function (err, spaces) {
+        return sails.services.podioapi.podioOrgSpaces(req.body, function (err, orgs) {
             if (err) {
                 res.forbidden();
             } else {
-                res.view('project', {partialTemp: "spaces", projectsTypes: [], spaces: spaces});
+                res.view('project', {partialTemp: "spaces", projectsTypes: [], orgs: orgs});
             }
         });
     },
 
-    jobPostAutomation : function(req, res){
+    jobPostAutomation: function (req, res) {
         var spaceID = req.param('spaceID');
         sails.services.podioapi.podioAppCreate(spaceID);
         res.view('project', {partialTemp: "loading"});
     },
 
-    syncComplete : function(req, res){
+    syncComplete: function (req, res) {
         res.view('project', {partialTemp: "synccomplete"});
     },
 

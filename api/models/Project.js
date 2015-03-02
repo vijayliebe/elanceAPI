@@ -39,9 +39,9 @@ module.exports = {
         Project.find({jobId: pid}).exec(function (err, proj) {
             if (!err) {
                 if (proj.length == 0) {
-                    return callback(null, {errorType: "Project Details", errorMessage: "No Project with this ID"});
+                     callback(null, {errorType: "Project Details", errorMessage: "No Project with this ID"});
                 } else {
-                    return callback(null, proj);
+                     callback(null, proj);
                 }
 
 

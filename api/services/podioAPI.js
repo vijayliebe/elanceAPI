@@ -127,9 +127,9 @@ module.exports = {
 //            });
     },
 
-    podioSpaces: function (req, callback) {
+    podioOrgSpaces: function (req, callback) {
 
-        rp('https://api.podio.com/space/top?oauth_token=' + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token)
+        rp('https://api.podio.com/org?oauth_token=' + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token)
             .then(function (body) {
                 var _data = JSON.parse(body);
                 return callback(null, _data);
@@ -1093,14 +1093,14 @@ module.exports = {
             .catch(console.error);
     },
 
-    podioSaveProposalItem: function (currentProject, jobData, elanceProposal, callback) {
-        Application.find({user_id: 2718133, "config.item_name": "Proposal"}).exec(function (err, appDetail) {
+    podioSaveProposalItem: function (userId, podioAccess, currentProject, jobData, elanceProposal, callback) {
+        Application.find({user_id: userId, "config.item_name": "Proposal"}).exec(function (err, appDetail) {
             if (err) {
                 console.log('Failed');
             } else {
                 var appID = appDetail[0].app_id;
                 rp({
-                    uri: "https://api.podio.com/item/app/" + appID + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
+                    uri: "https://api.podio.com/item/app/" + appID + "?oauth_token=" + podioAccess,
                     method: "POST",
                     json: true,
                     headers: {
@@ -1143,21 +1143,67 @@ module.exports = {
 
     },
 
-    podioGetItemById : function(podioAccess, itemId, callback){
+    podioGetItemById: function (podioAccess, itemId, callback) {
+
+        rp({
+            uri: "https://api.podio.com/item/" + itemId + "?oauth_token=" + podioAccess,
+            method: "GET",
+            timeout: 10000,
+            followRedirect: true,
+            maxRedirects: 10
+        }).then(function (body) {
+            var _data = JSON.parse(body);
+            return callback(null, _data);
+        })
+            .catch(function (error) {
+                console.log(error)
+            });
+
+    },
+
+    podioRefreshToken: function (userID, callback) {
+
+        User.getUserById(userID, function (err, user) {
+            if (!err) {
+                var userData = user;
+                var podioAccess = user[0].podioAuth.access_token;
+                var podioRefreshToken = user[0].podioAuth.refresh_token;
+
 
                 rp({
-                    uri: "https://api.podio.com/item/" + itemId + "?oauth_token=" + podioAccess,
-                    method: "GET",
-                    timeout: 10000,
-                    followRedirect: true,
-                    maxRedirects: 10
-                }).then(function(body){
-                    var _data = JSON.parse(body);
-                    return callback(null, _data);
+                    uri: "https://podio.com/oauth/token?grant_type=refresh_token&client_id=" + sails.config.globals.elancAppMainDataObj.client_id_podio + "&client_secret=" + sails.config.globals.elancAppMainDataObj.client_secret_podio + "&refresh_token=" + podioRefreshToken,
+                    method: "POST"
                 })
-                    .catch(function(error){
-                        console.log(error)
+                    .then(function (body) {
+                        var _data = JSON.parse(body);
+                        _data.tokenName = "podio";
+                        //return callback(null, _data);
+                        userData[0].podioAuth = _data;
+
+                        var _userData = {};
+                        _userData.userInfo = userData[0].userInfo;
+                        _userData.elanceAuth = userData[0].elanceAuth;
+                        _userData.podioAuth = userData[0].podioAuth;
+
+
+                        User.saveUser(_userData, function (err, users) {
+                            if (!err) {
+                                sails.config.globals.elancAppMainDataObj.userData = users;
+                                return callback(null, users);
+                            } else {
+                                console.log('podioAPI -> podioRefreshToken -> saveChangedUserInfo - Failed');
+                                return callback(err, {"status": "Failed"});
+                            }
+                        });
+                    })
+                    .catch(function (error) {
+                        console.log(error);
                     });
+
+            } else {
+                console.log('podioAPI - > podioRefreshToken -> failed');
+            }
+        });
 
     }
 }
