@@ -109,16 +109,10 @@ module.exports = {
                         formattedSubcateList[subCate.catName] = subCate;
                     });
 
-                    if (formattedSubcateList.category) {
-                        return formattedSubcateList.category.catId;
+                    if (formattedSubcateList[category]) {
+                        return formattedSubcateList[category].catId;
                     }
 
-
-//                    for (var i = 0; i < subcateList.length; i++) {
-//                        if (subcateList[i].catName == category) {
-//                            return subcateList[i].catId;
-//                        }
-//                    }
                 }
 
                 var postJobData = function (data) {
