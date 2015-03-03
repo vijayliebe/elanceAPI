@@ -1089,8 +1089,11 @@ module.exports = {
 
         })
             .then(function (body) {
+
             })
-            .catch(console.error);
+            .catch(function(error){
+
+            });
     },
 
     podioSaveProposalItem: function (userId, podioAccess, currentProject, jobData, elanceProposal, callback) {
@@ -1135,7 +1138,8 @@ module.exports = {
                     callback(null, body);
                 })
                     .catch(function (error) {
-                        console.log(error);
+                        var _error = JSON.parse(error.response.body);
+                        return callback(_error, {"status" : "Failed"});
                     })
             }
         });
@@ -1156,7 +1160,8 @@ module.exports = {
             return callback(null, _data);
         })
             .catch(function (error) {
-                console.log(error)
+                var _error = JSON.parse(error.response.body);
+                return callback(_error, {"status" : "Failed"});
             });
 
     },

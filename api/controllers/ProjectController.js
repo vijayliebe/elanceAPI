@@ -102,11 +102,23 @@ module.exports = {
                 subcateList = categ;
 
                 var getJobCategoryID = function (category) {
-                    for (var i = 0; i < subcateList.length; i++) {
-                        if (subcateList[i].catName == category) {
-                            return subcateList[i].catId;
-                        }
+
+                    var formattedSubcateList = {};
+
+                    _.each(subcateList, function(subCate){
+                        formattedSubcateList[subCate.catName] = subCate;
+                    });
+
+                    if (formattedSubcateList.category) {
+                        return formattedSubcateList.category.catId;
                     }
+
+
+//                    for (var i = 0; i < subcateList.length; i++) {
+//                        if (subcateList[i].catName == category) {
+//                            return subcateList[i].catId;
+//                        }
+//                    }
                 }
 
                 var postJobData = function (data) {

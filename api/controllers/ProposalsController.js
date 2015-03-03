@@ -96,6 +96,18 @@ module.exports = {
 
                                         }else{
                                             console.log('Awarding Proposal Failed');
+
+                                            if(err.errors[0].code == "invalid_token_expired"){
+                                                elanceAPI.elanceRefreshAccess(userId,function(err, refreshedToken){
+                                                    if(!err){
+                                                        useVerifiedHook();
+                                                    }else{
+                                                        console.log(err);
+                                                    }
+                                                });
+                                            }
+
+
                                         }
                                     });
 
@@ -107,6 +119,17 @@ module.exports = {
 
                         }else{
                             console.log('Getting podio proposal item - Failed');
+
+                            if(err.error_description == "expired_token"){
+                                podioAPI.podioRefreshToken(userId,function(err, refreshedToken){
+                                    if(!err){
+                                        useVerifiedHook();
+                                    }else{
+                                        console.log(err);
+                                    }
+                                });
+                            }
+
                         }
                     });
 

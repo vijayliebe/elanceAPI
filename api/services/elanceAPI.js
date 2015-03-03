@@ -29,6 +29,8 @@ module.exports = {
             })
             .catch(function (error) {
                 console.log(error);
+                var _error = JSON.parse(error.response.body);
+                return callback(_error, {"status" : "Failed"});
             });
     },
 
@@ -41,6 +43,8 @@ module.exports = {
         })
             .catch(function (error) {
                 console.log(error);
+                var _error = JSON.parse(error.response.body);
+                return callback(_error, {"status" : "Failed"});
             });
     },
 
@@ -53,7 +57,8 @@ module.exports = {
             return callback(null, _data);
         })
             .catch(function (error) {
-                return callback(error, {"status" : "Failed"});
+                var _error = JSON.parse(error.response.body);
+                return callback(_error, {"status" : "Failed"});
             });
     },
 
