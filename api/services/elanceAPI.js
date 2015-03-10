@@ -112,7 +112,38 @@ module.exports = {
         });
 
 
-    }
+    },
 
+    elanceWorkRoomMessaageByBidId: function (elanceAccess, bidId, callback) {
+        rp({
+            uri: "https://api.elance.com/api2/workroom/"+bidId+"/messages?access_token=" + elanceAccess,
+            method: "GET"
+        })
+            .then(function (body) {
+                var _data = JSON.parse(body);
+                return callback(null, _data);
+            })
+            .catch(function (error) {
+                console.log(error);
+                var _error = JSON.parse(error.response.body);
+                return callback(_error, {"status" : "Failed"});
+            });
+    },
+
+    elancePostWorkRoomMessaageByBidId: function (elanceAccess, bidId, message, callback) {
+        rp.post({
+            url: 'https://api.elance.com/api2/workroom/'+bidId+'/messages?access_token=' + elanceAccess,
+            form: {
+                comments : message
+            }
+        }).then(function (body) {
+            var _data = JSON.parse(body);
+            return callback(null, _data);
+        })
+            .catch(function (error) {
+                var _error = JSON.parse(error.response.body);
+                return callback(_error, {"status" : "Failed"});
+            });
+    }
 
 }

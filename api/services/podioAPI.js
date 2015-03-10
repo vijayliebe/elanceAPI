@@ -1042,11 +1042,34 @@ module.exports = {
                                                         })
                                                             .then(function (body) {
 
-                                                                console.log('proposal webhook created');
-                                                                setTimeout(function () {
-                                                                    sails.controllers.category.getElanceCategory(categoryAppID);
-                                                                    sails.controllers.subcategory.getElanceSubCategory(subCategoryAppID);
-                                                                }, 5000);
+                                                                console.log('Update proposal webhook created');
+
+                                                                //create web-hook for proposal app - create comment
+                                                                rp({
+                                                                    uri: "https://api.podio.com/hook/app/" + proposalAppID + "?oauth_token=" + sails.config.globals.elancAppMainDataObj.tokenDataPodio.access_token,
+                                                                    method: "POST",
+                                                                    json: true,
+                                                                    headers: {
+                                                                        "content-type": "application/json"
+                                                                    },
+                                                                    body: {
+                                                                        "url": sails.config.globals.elancAppMainDataObj.webredirecrUrlPodioHookProposalCreateComment + "/" + sails.config.globals.elancAppMainDataObj.userInfo.user_id,
+                                                                        "type": "comment.create"
+                                                                    }
+
+                                                                })
+                                                                    .then(function (body) {
+
+                                                                        console.log('create comment - proposal webhook created');
+
+                                                                        setTimeout(function () {
+                                                                            sails.controllers.category.getElanceCategory(categoryAppID);
+                                                                            sails.controllers.subcategory.getElanceSubCategory(subCategoryAppID);
+                                                                        }, 5000);
+
+
+                                                                    })
+                                                                    .catch(console.error);
 
 
                                                             })
@@ -1091,7 +1114,7 @@ module.exports = {
             .then(function (body) {
 
             })
-            .catch(function(error){
+            .catch(function (error) {
 
             });
     },
@@ -1139,7 +1162,7 @@ module.exports = {
                 })
                     .catch(function (error) {
                         var _error = JSON.parse(error.response.body);
-                        return callback(_error, {"status" : "Failed"});
+                        return callback(_error, {"status": "Failed"});
                     })
             }
         });
@@ -1161,7 +1184,7 @@ module.exports = {
         })
             .catch(function (error) {
                 var _error = JSON.parse(error.response.body);
-                return callback(_error, {"status" : "Failed"});
+                return callback(_error, {"status": "Failed"});
             });
 
     },
@@ -1210,5 +1233,40 @@ module.exports = {
             }
         });
 
+    },
+
+
+    getPodioItemComments: function (podioAccess, itemId, callback) {
+
+        rp('https://api.podio.com/comment/item/' + itemId + '?oauth_token=' + podioAccess)
+            .then(function (body) {
+                var _data = JSON.parse(body);
+                return callback(null, _data);
+            })
+            .catch(function (error) {
+                return callback(error, {"status": "failed"});
+            });
+    },
+
+    postPodioItemComments: function (podioAccess, message, itemId, callback) {
+
+        rp({
+            uri: 'https://api.podio.com/comment/item/' + itemId + '?oauth_token=' + podioAccess,
+            method: "POST",
+            json: true,
+            headers: {
+                "content-type": "application/json"
+            },
+            body: {
+                "value": message
+            }
+        })
+            .then(function (body) {
+                var _data = body;
+                return callback(null, _data);
+            })
+            .catch(function (error) {
+                return callback(error, {"status": "failed"});
+            });
     }
 }

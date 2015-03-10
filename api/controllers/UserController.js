@@ -18,20 +18,6 @@ module.exports = {
 
     elanceLogin :function(req, res){
         res.redirect('https://api.elance.com/api2/oauth/authorize?client_id='+sails.config.globals.elancAppMainDataObj.client_id_elance+'&redirect_uri='+sails.config.globals.elancAppMainDataObj.webredirecrUrlElance+'&scope=basicInfo&response_type=code');
-
-        //testing request-promise code start
-
-        /*rp('http://www.google.com', 'http://www.facebook.com', 'http://www.twitter.com')
-            .then(function(b1, b2, b3){
-                console.log('Google data=====>'+b1);
-                console.log('==================================================================================================================');
-                console.log('FB data======>'+b2);
-                console.log('==================================================================================================================');
-                console.log('Twitter data====>'+b3);
-            })
-            .catch(console.error);*/
-
-        //testing request-promise code end
     },
 
     podiologin :function(req, res){

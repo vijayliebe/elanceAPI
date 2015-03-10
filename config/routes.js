@@ -51,6 +51,7 @@ module.exports.routes = {
     '/podioWorkSpace' : 'ProjectController.podioWorkSpace',
     'POST /jobCreate/:userID' : 'ProjectController.podioJobCreate',
     'POST /proposalUpdate/:userID' : 'ProposalsController.elanceProposalUpdate',
+    'POST /proposalCreateComment/:userID' : 'MessagesController.elanceProposalCreateComment',
 
 
     /***************************************************************************

@@ -228,6 +228,7 @@ module.exports = {
                                                                 Proposals.create(elanceProposal).exec(function (err, proj) {
                                                                     if (!err) {
                                                                         console.log('Saving Proposal success');
+                                                                        sails.controllers.messages.getElanceMessages(userID);
                                                                     } else {
                                                                         console.log('Saving Proposal Failed');
                                                                     }
