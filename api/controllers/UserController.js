@@ -9,6 +9,9 @@ var elancAppMainDataObj = elancAppMainDataObj;
 var request = require("request");
 var rp = require('request-promise');
 var podioAuth, elanceAuth, userInfo;
+var OAuth = require('oauth');
+var util     = require('util');
+var oauth_token_old, tokenSecret;
 
 module.exports = {
     signup: function (req, res) {
@@ -165,6 +168,76 @@ module.exports = {
 
     elancePodioConfig : function(req, res){
         res.view('project', {partialTemp: "configPage"});
+    },
+
+    xeroLogin : function(req, res){
+        var oauth = new OAuth.OAuth(
+            'https://api.xero.com/oauth/RequestToken',
+            'https://api.xero.com/oauth/AccessToken',
+            'XNR1HUZFKG9WAAMSCCXGNZALAI62NF',
+            'CP0PKUFHCLJGCDYGGNTRDRXBB4CZYN',
+            '1.0A',
+             null,
+            'HMAC-SHA1'
+        );
+
+
+        oauth.getOAuthRequestToken({'oauth_callback': 'http://25b56dfd.ngrok.com/backxero'}, function(error, oauth_token, oauth_token_secret, results){
+            if(error) util.puts('error :' + error)
+            else {
+                oauth_token_old = oauth_token;
+                tokenSecret = oauth_token_secret;
+
+                util.puts('oauth_token :' + oauth_token)
+
+                req.session.oauth_token_secret = oauth_token_secret;
+                util.puts('oauth_token_secret :' + oauth_token_secret)
+                util.puts('requestoken results :' + util.inspect(results))
+                util.puts("Requesting access token")
+
+                res.redirect('https://api.xero.com/oauth/Authorize?oauth_token='+oauth_token);
+
+
+            }
+        })
+    },
+
+    backxero : function(req,res){
+        console.log(req.params.all());
+
+        res.send('Auth. successfull');
+        var oauth_token_secret = tokenSecret;
+        var oauth_token = req.param('oauth_token');
+        var oauth_verifier = req.param('oauth_verifier');
+        var org = req.param('org');
+
+        var oauth = new OAuth.OAuth(
+            'https://api.xero.com/oauth/RequestToken',
+            'https://api.xero.com/oauth/AccessToken',
+            'XNR1HUZFKG9WAAMSCCXGNZALAI62NF',
+            'CP0PKUFHCLJGCDYGGNTRDRXBB4CZYN',
+            '1.0A',
+            null,
+            'HMAC-SHA1'
+        );
+
+                    oauth.getOAuthAccessToken(oauth_token, oauth_token_secret, oauth_verifier,function(error, oauth_access_token, oauth_access_token_secret, results2) {
+                        console.dir(error);
+                        console.log(error)
+                        util.puts('error :'+error)
+                        util.puts('oauth_access_token :' + oauth_access_token)
+                        util.puts('oauth_token_secret :' + oauth_access_token_secret)
+                        util.puts('accesstoken results :' + util.inspect(results2))
+                        util.puts("Requesting access token")
+                        var data = "";
+                   oauth.getProtectedResource("https://api.xero.com/api.xro/2.0/Organisation",
+                                                "GET",
+                                                "application/json",
+                                                oauth_access_token,
+                                                oauth_access_token_secret,  function (error, data, response) {
+                        util.puts(data);
+                    });
+                });
     }
 };
 
